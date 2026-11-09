@@ -1,0 +1,45 @@
+# ==========================================================
+# 不纳入版本管理的文件
+# 原则：源码 / 文档 / 实验结果入库；大体积二进制、数据集、临时产物不入库
+# ==========================================================
+
+# ---- 打包产物：可由 scripts/make_bundle.sh 一键重建 ----
+bundle.tgz
+*.tgz
+
+# ---- 第三方离线 wheel：约 55MB，由 scripts/fetch_wheels.py 下载 ----
+wheels/*.whl
+
+# ---- 数据集：GroupLens 使用条款不允许再分发 ----
+data/
+ml-latest-small/
+*.zip
+
+# ---- 运行日志与临时导出 ----
+*.log
+results/*.log
+*.tmp
+*.swp
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.ipynb_checkpoints/
+
+# ---- Spark / Hive 本地残留 ----
+metastore_db/
+derby.log
+spark-warehouse/
+checkpoint/
+*.crc
+
+# ---- 编辑器 / 操作系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

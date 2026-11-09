@@ -1,0 +1,10 @@
+# Windows 本机依赖：画图脚本 + Streamlit 演示页
+#   python -m pip install -r requirements.txt
+#
+# 注意：master 容器内【不要】用这个文件。
+# 课程容器无 pip、无外网，PySpark MLlib 必需的 numpy 与 distutils 兼容层
+# 由 install_numpy.sh 用离线 wheel 解压安装。
+
+pandas>=2.0
+matplotlib>=3.7
+streamlit>=1.30

@@ -6,6 +6,8 @@
 
 全程在 **Windows PowerShell** 里敲命令。路径含中文和空格，**双引号不能省**。
 
+> 本文档里的 `C:\...` 是本机实际路径示例，推送后会出现在公开仓库中（含 Windows 目录名）。如果不希望公开，推送前把本文档中的路径替换成 `<项目目录>` 即可，不影响其它文件。其它隐私事项见 8.1 节。
+
 ---
 
 ## 0. 先确认本地状态
@@ -24,7 +26,7 @@ nothing to commit, working tree clean
 a1b2c3d  feat: MovieLens 推荐系统课程大作业完整代码与实验文档
 ```
 
-看到 `nothing to commit, working tree clean` 说明本地已经干净地提交好了。
+哈希与提交信息可能略有不同（本文是示例），**关键看最后一行** `nothing to commit, working tree clean`，它表示本地文件都已提交、没有遗漏。
 
 再确认大文件确实没被纳入版本管理：
 

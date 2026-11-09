@@ -117,9 +117,10 @@ R ≈ U · Vᵀ        (rank = 隐向量维度)
 │   ├── DATASET.md             数据来源、许可与引用
 │   └── PUSH_TO_GITHUB.md      完整上传步骤与报错处理
 ├── wheels/README.md           离线 wheel 说明（wheel 本体不入库）
-├── results/                   本次实验输出：CSV + 7 张 PNG
-│   └── README.md              数据字典（每个文件的来源与列名）
-└── figures 见 results/figures/
+└── results/                   本次实验输出
+    ├── README.md              数据字典（每个文件的来源与列名）
+    ├── *.csv                  10 份结果表（统计 / 推荐 / 相似 / 调参）
+    └── figures/*.png          7 张统计图
 ```
 
 **不纳入版本管理的文件**（由 `.gitignore` 排除，可随时重建）：
@@ -148,9 +149,9 @@ python -m pip install -r requirements.txt
 ```bash
 # [VM] 把本仓库放到 ~/bigdata-final（可用 scp / 共享文件夹 / git clone）
 cd ~/bigdata-final
-bash download_data.sh                 # 下载 ml-latest-small 到 data/
-python scripts/fetch_wheels.py        # 有网时补齐 wheels/*.whl
-bash install_numpy.sh                 # 离线装入 master 容器：numpy + distutils 兼容层
+bash download_data.sh                  # 下载 ml-latest-small 到 data/
+python3 scripts/fetch_wheels.py        # 有网时补齐 wheels/*.whl
+bash install_numpy.sh                  # 离线装入 master 容器：numpy + distutils 兼容层
 ```
 
 容器里的 `/opt/final/` 不是数据卷，**每次重建容器后**都要重做：
@@ -186,12 +187,33 @@ bash submit.sh 07_export.py
 
 常用覆盖参数：`DRIVER_MEM=2g PARTITIONS=8`、`GRID_RANKS=... GRID_REGS=...`、`TARGET_MOVIE=1`、`REC_USER_LIMIT=0`。完整变量表见手册附录 C。
 
-### 5.4 Hive 统计（可与 Spark 分阶段执行，别同时开，虚拟机内存有限）
+### 5.4 Hive 统计（与 Spark 共用容器名，必须分阶段跑）
+
+虚拟机只有 4–6 GB，Hive 与 Spark 不要同时开。Hive 表指向 HDFS 原始 CSV，停容器不丢数据。
 
 ```bash
-# [VM]
+# [VM] 1) 停 Spark，切到实验三启动 Hadoop + Hive
+cd ~/lab04 && bash stop-spark.sh
+cd ~/lab03
+bash start-hadoop.sh
+bash start-hive.sh
+sleep 20
+
+# 2) 把 SQL 拷进 hive 容器再执行（不能写 /opt/final，那个目录只在 master 里）
+docker cp ~/bigdata-final/sql/hive_ddl.sql hive:/tmp/hive_ddl.sql
 docker exec hive /usr/local/hive/bin/beeline \
-  -u 'jdbc:hive2://localhost:10000/default' -f /opt/final/hive_ddl.sql
+  -u 'jdbc:hive2://localhost:10000/default' -f /tmp/hive_ddl.sql
+
+# 3) 可选：导出评分分布 CSV
+docker exec hive /usr/local/hive/bin/beeline \
+  -u 'jdbc:hive2://localhost:10000/default' --outputformat=csv2 \
+  -e "USE movielens; SELECT rating, COUNT(*) AS cnt FROM ratings GROUP BY rating ORDER BY rating;" \
+  > ~/bigdata-final/results/hive_rating_dist.csv
+
+# 4) 用完切回实验四 Spark；容器重建后脚本与依赖要重新拷/装
+cd ~/lab03 && bash stop-hive.sh
+cd ~/lab04 && bash start-spark.sh
+docker cp ~/bigdata-final/src/. master:/opt/final/
 ```
 
 ### 5.5 取回结果、画图、演示

@@ -1,24 +1,20 @@
-# 统一文本文件换行符。
-# 关键：*.sh 必须 LF。课程容器里的 bash 遇到 CRLF 会把 "set -o pipefail"
-# 读成 "pipefail\r"，报 ": invalid option name"。
+# shell 脚本用 LF，否则 Linux 容器里执行会报错
 * text=auto
 
-*.sh           text eol=lf
-*.py           text eol=lf
-*.sql          text eol=lf
-*.md           text eol=lf
-*.csv          text eol=lf
-*.txt          text eol=lf
-LICENSE        text eol=lf
-.gitignore     text eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+*.sql text eol=lf
+*.md text eol=lf
+*.csv text eol=lf
+*.txt text eol=lf
+LICENSE text eol=lf
+.gitignore text eol=lf
 .gitattributes text eol=lf
 
-# 二进制文件不做换行转换
-*.whl     binary
-*.png     binary
-*.jpg     binary
-*.jpeg    binary
-*.pdf     binary
-*.tgz     binary
-*.zip     binary
+*.whl binary
+*.png binary
+*.jpg binary
+*.pdf binary
+*.tgz binary
+*.zip binary
 *.parquet binary
